@@ -13,7 +13,9 @@ let dh = new Discord.RichEmbed()
 .addField(`${prefix}daily`,`Gives You The Daily Credits`)
 .addField(`${prefix}balance`,`Shows Your Total Balance Earned By Daily command`)
 .addField(`${prefix}invites`,`Shows Your Total Invites`)
-.setFooter(`Requested By ${message.author.username}`)
+.addField(`${prefix}avatar`,`Shows Your Pretty Avatar`)
+.addField(`${prefix}bug`,`If You Find Any Bug In Bot Then Use ${prefix}bug [yourbug]`)
+.setFooter(`Requested By ${message.author.username}`);
 
 message.channel.send(dh);
 }

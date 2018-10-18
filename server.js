@@ -55,7 +55,7 @@ client.on("guildCreate", (guild, bot) => {
 .setAuthor(client.user.username)
 .setThumbnail(bicon)
 .setColor("RANDOM")
-.setTitle("Thanks\'s For Inviting Me")
+.setTitle(`Thanks\'s For Inviting Me If You Find Any Bug Report It By ${prefix}bug [yourbug]`)
 .addField(`Hello I Am Lithium Ion`,"A Bot Developed By R4A W RAJAT#4037")
 .addField(`My Prefix Is ${prefix}`,`And Help Command ${prefix}help`)
 .setTimestamp()
