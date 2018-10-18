@@ -1,42 +1,16 @@
 var Discord = require(`discord.js`)
-let client = new Discord.Client();
 
-exports.run = async (bot, message) => {
+module.exports.run = async (client, message, args) => {
 
-let botconfig = require(`../botconfig.json`)
-if (!message.content.startsWith(botconfig.prefix)) return;
-  
-
-message.channel.send({embed: {
-    color: 3447003,
-    author: {
-      name: bot.user.username
-    },
-    title: "A Bot Build By RGxHYDRA SHOCK",
-    url: "https://discord.gg/QEtT4X3",
-    fields: [{
-        name: "Bot Invite Command",
-        value: "Our Another Bot Invite Link Also Available"
-      },
-      {
-        name: "Music Beast Invite Link",
-        value:" [Click Me To Invite Me](https://discordapp.com/api/oauth2/authorize?client_id=479143648668155905&permissions=0&scope=bot)"
-      },
-       {
-        name: "JBS Invite Link",
-        value:" [Click Me To Invite Me](https://discordapp.com/api/oauth2/authorize?client_id=475146750617976832&permissions=0&scope=bot)"
-      },
-       {
-        name: "Lithium Invite Link",
-        value:" [Click Me To Invite Me](https://goo.gl/54uoNf)"
-      },
-    ],
-    timestamp: new Date(),
-    footer: {
-      text: "© A PART OF JBS"
-    }
-  }
-});
+let inviteemb = new Discord.RichEmbed()
+.setAuthor(client.user.username)
+.setColor("#fffff")
+.setTitle("A Bot Build By R4A W RAJAT#4037")
+.setURL("https://discord.gg/W6tM9eu")
+.addField("Bot Invite","A Music Bot For Your Server")
+.addField(`${client.user.username} Invite Link`," [Click Me To Invite](https://discordapp.com/api/oauth2/authorize?client_id=479143648668155905&permissions=0&scope=bot)")
+.setFooter("©R4A")
+return message.channel.send(inviteemb);
 
 }
 exports.help = {

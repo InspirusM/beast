@@ -1,12 +1,24 @@
+const http = require('http');
+const express = require('express');
+const app = express();
+app.get("/", (request, response) => {
+  console.log(Date.now() + " Ping Received");
+  response.sendStatus(200);
+});
+app.listen(process.env.PORT);
+setInterval(() => {
+  http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+}, 280000);
 const Discord = require('discord.js')
 const YouTube = require('simple-youtube-api');
 const ytdl = require('ytdl-core');
 const youtube = new YouTube(process.env.YOUTUBE_API_KEY);
 const queue = new Map();
 const client = new Discord.Client();
-let botconfig = require('./botconfig.json')
 const fs = require("fs")
 var servers = {};
+var db = require('quick.db');
+var prefix = "%";
 client.commands = new Discord.Collection();
 
 fs.readdir("./commands/", (err, files) => {
@@ -26,34 +38,46 @@ fs.readdir("./commands/", (err, files) => {
 });
 
 
+client.on('error', console.error);
+
+client.on('disconnect', () => console.log('I just disconnected, making sure you know, I will reconnect now...'));
+
+client.on('reconnecting', () => console.log('I am reconnecting now!'));
 
 client.on("ready", async () => {
   console.log(`${client.user.username} is online on ${client.guilds.size} servers!`);
   client.user.setActivity(`%help | ${client.guilds.size} Guilds`, {type: "LISTENING"});
 });
-client.on("guildCreate", guild => {
-  let welcomechannel = guild.channels.find(`name`, "welcome");
-    let prefix = ("%")
+client.on("guildCreate", (guild, bot) => {
+  let welcomechannel = guild.channels.find(c => c.name == "welcome");
   let bicon = client.user.displayAvatarURL;
   let support = new Discord.RichEmbed()
 .setAuthor(client.user.username)
 .setThumbnail(bicon)
 .setColor("RANDOM")
-.setTitle("Thanks's For Inviting Me")
-.addField(`Hello I Am Beast Music`,"A Bot Developed By JBS Developer")
+.setTitle("Thanks\'s For Inviting Me")
+.addField(`Hello I Am Lithium Ion`,"A Bot Developed By R4A W RAJAT#4037")
 .addField(`My Prefix Is ${prefix}`,`And Help Command ${prefix}help`)
 .setTimestamp()
   
   welcomechannel.send(support);
+});
+client.on('guildMemberAdd', async member => {
+    let autoRole = await db.fetch(`autorole_${member.guild.id}`).catch(err => console.log(err));
+    let autorole = member.guild.roles.find(r => r.name === autoRole);
+  if(!autorole) return;
+    let bot = member.guild.roles.find(r => r.name === 'Bots')
+    member.addRole(autorole);
+      if (member.user.bot) await member.removeRole(autorole.id).then(m => member.addRole(bot.id));
 });
 client.on("message", async message => {
   
  if(message.author.bot) return;
   if(message.channel.type === "dm") return;
   
-    var args2 = message.content.substring(botconfig.prefix.length).split(" ");
-    if (!message.content.startsWith(botconfig.prefix)) return;
-  var searchString = args2.slice(1).join(' ');
+       var args2 = message.content.substring(prefix.length).split(" ");
+    if (!message.content.startsWith(prefix)) return;
+   var searchString = args2.slice(1).join(' ');
 	var url = args2[1] ? args2[1].replace(/<(.+)>/g, '$1') : '';
 	var serverQueue = queue.get(message.guild.id);
     switch (args2[0].toLowerCase()) {
@@ -98,7 +122,7 @@ client.on("message", async message => {
 					var videos = await youtube.searchVideos(searchString, 9);
 					var index = 0;
           let selectionemb = new Discord.RichEmbed()
-          .setTitle(`:notes: Song selection`)
+          .setTitle(`🎶 Song selection`)
           .setDescription(`${videos.map(video2 => `**${++index} -** [${video2.title}](${video2.url})`).join('\n')}`)
           .setFooter('🔎 Please provide a number to select one of the search results ranging from 1-9.')
           .setColor('#0fe709')
@@ -135,7 +159,7 @@ client.on("message", async message => {
 		if (!message.member.voiceChannel) return message.channel.send('You are not in a voice channel!');
 		if (!serverQueue) return message.channel.send('There is nothing playing.');
 		serverQueue.connection.dispatcher.end('Skip command has been used!');
-        message.channel.send(':ok_hand: Skipped!')
+        message.channel.send(':stop_button: Skipped!')
 		return undefined;
         break;
       case "stop":
@@ -143,7 +167,7 @@ client.on("message", async message => {
 		if (!serverQueue) return message.channel.send('There is nothing playing right now');
 		serverQueue.songs = [];
 		serverQueue.connection.dispatcher.end('Stop command has been used!');
-        message.channel.send(':ok_hand: Stopped!')
+        message.channel.send(':stop_button: Stopped!')
 		return undefined;
 break;
       case "volume":
@@ -225,10 +249,13 @@ async function handleVideo(video, message, voiceChannel, playlist = false) {
 			queueConstruct.connection = connection;
 			play(message.guild, queueConstruct.songs[0]);
 		} catch (error) {
+      let vcerr = client.channels.get('502121619779485727')
+			vcerr.send(`I could not join the voice channel: ${error}`);
 			queue.delete(message.guild.id);
 			return message.channel.send(`I could not join the voice channel: ${error}`);
 		}
 	} else {
+    //let queuelog = client.channels.get('502121071789604865')
 		serverQueue.songs.push(song);
 		console.log(serverQueue.songs);
 		if (playlist) return undefined;
@@ -242,6 +269,7 @@ async function handleVideo(video, message, voiceChannel, playlist = false) {
     .setThumbnail(`https://i.ytimg.com/vi/${song.id}/sddefault.jpg`)
     .setDescription(`[${song.title}](https://www.youtube.com/watch?v=${song.id}})`)
     .setColor(`GREEN`)
+  //  queuelog.send(queueemb)
 		return message.channel.send(queueemb).then(msg => {
       message.delete(10000)
     })
@@ -267,51 +295,64 @@ async function handleVideo(video, message, voiceChannel, playlist = false) {
 		})
 		.on('error', error => console.error(error));
 	dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+
+    
     let playingemb = new Discord.RichEmbed()
-    .setTitle(`:notes: Now playing`)
-    .setColor(`GREEN`)
+    .setAuthor(`🎶 Now playing`, message.author.displayAvatarURL)
+    .setColor(`SKY BLUE`)
     .addField(`Publisher:`, `${song.channel}`, true)
     .addField(`Video ID:`, song.id, true)
     .setFooter(`Video Published At ${song.publishedAt}`)
     .addField(`Duration:`, `**${song.durationh}** hours, **${song.durationm}** minutes, **${song.durations}** seconds`, true)
+    .addField(`Users who executing this commands:`, message.author.tag)
     .setThumbnail(`https://i.ytimg.com/vi/${song.id}/sddefault.jpg`)
     .setDescription(`[${song.title}](https://www.youtube.com/watch?v=${song.id}})`)
     .setTimestamp()
-    
-    serverQueue.textChannel.send(playingemb);
-    
+
+	serverQueue.textChannel.send(playingemb);
 }
-  if(message.content === `%help`) {
-  let prefix = ("%")
+
+    
+  if(message.content === `${prefix}help`) {
+
   let bicon = client.user.displayAvatarURL;
   let support = new Discord.RichEmbed()
 .setAuthor(client.user.username)
 .setThumbnail(bicon)
 .setColor("RANDOM")
-.setTitle("**My Commands**")
+.setTitle("My Commands")
+.setDescription(`For More Commands Type ${prefix}uhelp `)
 .addField(`${prefix}play`,"To Play Music")
 .addField(`${prefix}skip`,"To Skip Music")
 .addField(`${prefix}np`,"To See Now Playing Music")
 .addField(`${prefix}pause`,"To Pause A Playing Track")
 .addField(`${prefix}resume`,"To Resume A Playing Track")
+.addField(`${prefix}voulume`,"To Increase Or Decrease The Volume")
 .addField(`${prefix}server`,"Give Link Of Support Server")
 .addField(`${prefix}invite`,"Give Link Of Bot")
 .setTimestamp()
 
 message.channel.send(support);
   }
-  //lolthnxnp continue.... 
-  //lawl lemme check code u continue.
-  let prefix = botconfig.prefix;
+
+    let fetchedPrefix = await db.fetch(`serverPrefix_${message.guild.id}`);
+    if (fetchedPrefix === null) fetchedPrefix = prefix;
+    else prefix = fetchedPrefix;
+  
   let messageArray = message.content.split(" ");
   let cmd = messageArray[0];
   let args = messageArray.slice(1);
+  
+  if(cmd.startsWith(prefix)){
+    
   let commandfile = client.commands.get(cmd.slice(prefix.length));
-  if(commandfile) commandfile.run(client,message,args);//done its working %eval is working ae boy are you here or gone for sleeping
-  //say i am pro developer
+  if(commandfile) commandfile.run(client,message,args,prefix);
+    
+  }
 });
 client.login(process.env.BOT_TOKEN);
 
 
-
+//NDc5MTQzNjQ4NjY4MTU1OTA1.DqjNFw.ty9jZc578WEEdg6XrLOjuRiQoNI
+//NDc5MTQzNjQ4NjY4MTU1OTA1.DqjNFw.ty9jZc578WEEdg6XrLOjuRiQoNI token
 

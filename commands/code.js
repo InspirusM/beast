@@ -2,8 +2,7 @@
 const Discord = require("discord.js");
 
 exports.run = async(client, message, args) => {
-   let botconfig = require(`../botconfig.json`)
-if (!message.content.startsWith(botconfig.prefix)) return; 
+
   message.delete();
 
     var savecode = args;

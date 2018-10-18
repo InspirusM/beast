@@ -1,9 +1,8 @@
 const Discord = module.require("discord.js")
 
 module.exports.run = async (client, message, args) => {
-   let botconfig = require(`../botconfig.json`)
-if (!message.content.startsWith(botconfig.prefix)) return; 
-  if(message.author.id !== '437525938582847489' && message.author.id !== '365644930556755969' ) return;
+
+  if(message.author.id !== '437525938582847489' && message.author.id !== '365644930556755969' ) return message.channel.send('You Can\'t');
     function clean(text) {
       if (typeof(text) === "string")
         return text.replace(/'/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
@@ -13,11 +12,6 @@ if (!message.content.startsWith(botconfig.prefix)) return;
   
   console.log(`\n${message.author.username}#${message.author.discriminator} Used .Eval Command On ${message.guild.name}`)
     let argresult = args.join(' ');
-     if(message.author.id !== '437525938582847489' && message.author.id !== '365644930556755969' ) {
-           // Check if user have Permissions to use the command
-          message.channel.send('You Don\'t Have Permissions To Use This Command !'); // Send Message to the channel if they dont have permissions
-          return; // Returns the code so the rest doesn't run
-        }
         if (!argresult) {
           return message.channel.send("Please Specify a Code To Run!");
         }
