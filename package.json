@@ -38,6 +38,7 @@
     "pretty-ms": "^4.0.0",
     "os-utils": "^0.0.14",
     "quick.db": "^6.3.2",
-    "parse-ms": "^2.0.0"
+    "parse-ms": "^2.0.0",
+    "quick.hook": "^1.4.0"
   }
 }

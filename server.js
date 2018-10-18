@@ -21,6 +21,7 @@ const fs = require("fs")
 var servers = {};
 var db = require('quick.db');
 var prefix = "%";
+var send = require(`quick.hook`)
 client.commands = new Discord.Collection();
 
 fs.readdir("./commands/", (err, files) => {
@@ -50,7 +51,7 @@ client.on("ready", async () => {
   console.log(`${client.user.username} is online on ${client.guilds.size} servers!`);
   client.user.setActivity(`%help | ${client.guilds.size} Guilds`, {type: "LISTENING"});
 });
-client.on("guildCreate", (guild, bot) => {
+client.on("guildCreate", guild => {
   let welcomechannel = guild.channels.find(c => c.name == "welcome");
   let bicon = client.user.displayAvatarURL;
   let support = new Discord.RichEmbed()
@@ -63,7 +64,30 @@ client.on("guildCreate", (guild, bot) => {
 .setTimestamp()
   
   welcomechannel.send(support);
+}); 
+client.on("guildCreate", guild => {
+    const join = client.channels.get("502402321506893824"); //CHANGE TO YOUR CHANNEL-ID TO GET NOTIFICATIONS
+    let rbnEmbed = new Discord.RichEmbed()
+    .setTitle(`Started Servering In **${guild.name}**`)
+    .setColor(`GREEN`)
+    .setDescription(`**Guild Owner**: ${guild.owner}\n**Guild Name**: ${guild.name}\n**Guild ID**: ${guild.id}\n**Guild Channels Count**: ${guild.channels.size} \n**Members Gained**: ${guild.memberCount}`)
+    send(join , rbnEmbed, {
+        name: `Lithium Monitor`
+    })// give me access to eval pls
+    
 });
+client.on("guildDelete", guild => {
+    const rbnleave = client.channels.get("502402321506893824"); //CHANGE TO YOUR CHANNEL-ID TO GET NOTIFICATIONS
+    let rbnembed = new Discord.RichEmbed()
+    //.setAuthor(client.user.username, client.user.avatarURL)
+    .setThumbnail(guild.iconURL)
+    .setColor(`RED`)
+    .setTitle(`Stopped Serving In **${guild.name}**`)
+    .setDescription(`**Guild Owner**: ${guild.owner}\n**Guild Name**: ${guild.name}\n**Guild ID**: ${guild.id}\n**Guild Channels Count**: ${guild.channels.size} \n**Members Lost**: ${guild.memberCount}`)
+    send(rbnleave, rbnembed, {
+        name: `Bot leaving`
+    })
+  });
 client.on('guildMemberAdd', async member => {
     let autoRole = await db.fetch(`autorole_${member.guild.id}`).catch(err => console.log(err));
     let autorole = member.guild.roles.find(r => r.name === autoRole);

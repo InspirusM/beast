@@ -13,6 +13,7 @@ dependencies:
   parse-ms: 2.0.0
   pretty-ms: 4.0.0
   quick.db: 6.3.2
+  quick.hook: 1.4.2
   simple-youtube: 0.1.1
   simple-youtube-api: 5.0.2
   sip: 0.0.4
@@ -880,6 +881,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-+Fd7skXH/MDoX4TIlwstzt4TsjOqF/3joDurXrSEePf0KPYXEwwq3EnzoJ6C4dzZ58KGSasNdAU1OeC8envvWA==
+  /quick.hook/1.4.2:
+    dev: false
+    resolution:
+      integrity: sha512-xHIMFv38Qri4D5A7yH9IO0TrAN2/wtHg8TuwSgMG3JFHM8LYIOiEqUdWArgRmsk44PBLndaVitgG7SAgZR5E1w==
   /range-parser/1.2.0:
     dev: false
     engines:
@@ -1227,6 +1232,7 @@ specifiers:
   parse-ms: ^2.0.0
   pretty-ms: ^4.0.0
   quick.db: ^6.3.2
+  quick.hook: ^1.4.0
   simple-youtube: ^0.1.1
   simple-youtube-api: ^5.0.2
   sip: ^0.0.4
